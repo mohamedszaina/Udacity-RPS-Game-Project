@@ -53,7 +53,7 @@ class CyclePlayer(Player):
         return move
 
 
-class HumanPlayer:
+class HumanPlayer(Player):
     def move(self):
         while True:
             move = input("Enter your move (rock/paper/scissors) "
@@ -99,6 +99,9 @@ class Game:
             print("Player 2 wins!")
             self.score_p2 += 1
 
+        self.p1.learn(move1, move2)
+        self.p2.learn(move2, move1)
+
     def play_game(self):
         print("Game start!")
         round_num = 0
@@ -121,7 +124,7 @@ class Game:
 
 if __name__ == '__main__':
     player_strategies = [RockPlayer(), RandomPlayer(), ReflectPlayer(),
-                         CyclePlayer(), HumanPlayer()]
+                         CyclePlayer()]
     p1 = HumanPlayer()
     p2 = random.choice(player_strategies)
     game = Game(p1, p2)
