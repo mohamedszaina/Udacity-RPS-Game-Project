@@ -1,23 +1,19 @@
 import random
 
 moves = ['rock', 'paper', 'scissors']
-"""
-the Player class does not have any specific use or functionality in my code.
-It serves as a parent class for other player classes,
-but it does not provide any unique methods or attributes.
 
-Since the Player class does not have any significant functionality,
-I remove it without affecting the rest of the code.
-The child classes directly inherit from object,
-which is the default behavior in Python,
-so there's no explicit need to have the empty Player class.
-"""
-# class Player:
-#     def move(self):
-#         return 'rock'
 
-#     def learn(self, my_move, their_move):
-#         pass
+class Player:
+    def __init__(self):
+        self.my_move = None
+        self.their_move = None
+
+    def move(self):
+        return 'rock'
+
+    def learn(self, my_move, their_move):
+        self.my_move = my_move
+        self.their_move = their_move
 
 
 def beats(one, two):
@@ -26,19 +22,45 @@ def beats(one, two):
             (one == 'paper' and two == 'rock'))
 
 
-class RandomPlayer:
+class RockPlayer(Player):
+    def move(self):
+        return 'rock'
+
+
+class RandomPlayer(Player):
     def move(self):
         return random.choice(moves)
+
+
+class ReflectPlayer(Player):
+    def move(self):
+        if self.their_move is None:
+            return random.choice(moves)
+        return self.their_move
+
+    def learn(self, my_move, their_move):
+        self.their_move = their_move
+
+
+class CyclePlayer(Player):
+    def __init__(self):
+        super().__init__()
+        self.move_index = 0
+
+    def move(self):
+        move = moves[self.move_index]
+        self.move_index = (self.move_index + 1) % 3
+        return move
 
 
 class HumanPlayer:
     def move(self):
         while True:
-            move = input("Enter your move (rock/paper/scissors)"
-                         f" or 'quit' to end the game: ").lower()
+            move = input("Enter your move (rock/paper/scissors) "
+                         "or 'quit' to end the game: ").lower()
             if move in moves:
                 return move
-            elif move.lower() == 'quit':
+            elif move == 'quit':
                 return 'quit'
             else:
                 print("Invalid move. Please try again.")
@@ -98,5 +120,9 @@ class Game:
 
 
 if __name__ == '__main__':
-    game = Game(HumanPlayer(), RandomPlayer())
+    player_strategies = [RockPlayer(), RandomPlayer(), ReflectPlayer(),
+                         CyclePlayer(), HumanPlayer()]
+    p1 = HumanPlayer()
+    p2 = random.choice(player_strategies)
+    game = Game(p1, p2)
     game.play_game()
